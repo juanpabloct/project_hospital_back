@@ -1,0 +1,772 @@
+{
+	"info": {
+		"_postman_id": "8c5bdfcd-c9eb-4a11-b049-74d7df6db11e",
+		"name": "Sistema Hospitalario - API",
+		"description": "Colección de Postman para probar todos los endpoints del Sistema Hospitalario, cubriendo las 4 Historias de Usuario (HU-01, HU-02, HU-03, HU-04).\n\n### Instrucciones de uso:\n1. Importa este archivo en Postman.\n2. Asegúrate de tener levantado el backend (`npm run start:dev` o Docker).\n3. Usa los logins para almacenar automáticamente los tokens en las variables de la colección.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "HU-03: Gestión de Usuarios y Autenticación",
+			"item": [
+				{
+					"name": "1. Login Administrador",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {",
+									"    const response = res.getBody();",
+									"    if (response && response.accessToken) {",
+									"        tc.setVar(\"adminToken\", response.accessToken);",
+									"        console.log(\"adminToken guardado con éxito!\");",
+									"    }",
+									"} catch (e) {",
+									"    console.warn(\"No se pudo obtener adminToken (respuesta no válida o error de login): \", e.message);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin@hospital.com\",\n    \"password\": \"adminpassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Inicia sesión con la cuenta de administrador sembrada por defecto y guarda automáticamente el token en `adminToken`."
+					},
+					"response": []
+				},
+				{
+					"name": "2. Crear Usuario (ADMIN)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"recepcionista_demo@hospital.com\",\n    \"password\": \"recepcionista123\",\n    \"role\": \"RECEPTIONIST\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Crea un usuario con rol específico (ADMIN, RECEPTIONIST, DOCTOR, PATIENT). Restringido a Administradores."
+					},
+					"response": []
+				},
+				{
+					"name": "3. Obtener Mi Perfil",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						},
+						"description": "Retorna la información del usuario autenticado."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints relacionados con la administración de usuarios y logins."
+		},
+		{
+			"name": "HU-01: Gestión de Pacientes",
+			"item": [
+				{
+					"name": "1. Login Recepcionista",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {",
+									"    const response = res.getBody();",
+									"    if (response && response.accessToken) {",
+									"        tc.setVar(\"receptionistToken\", response.accessToken);",
+									"        console.log(\"receptionistToken guardado con éxito!\");",
+									"    }",
+									"} catch (e) {",
+									"    console.warn(\"No se pudo obtener receptionistToken (respuesta no válida o error de login): \", e.message);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"recepcionista_demo@hospital.com\",\n    \"password\": \"recepcionista123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Inicia sesión con el recepcionista creado previamente y guarda el token en `receptionistToken`."
+					},
+					"response": []
+				},
+				{
+					"name": "2. Registrar Paciente (RECEPCIONISTA)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{receptionistToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Carlos\",\n    \"lastName\": \"Gómez\",\n    \"documentType\": \"CC\",\n    \"documentNumber\": \"10203040\",\n    \"email\": \"carlos.gomez@gmail.com\",\n    \"phone\": \"3001234567\",\n    \"eps\": \"Sura\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/patients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients"
+							]
+						},
+						"description": "Registra un nuevo paciente. Crea una cuenta de usuario automática con el `email` como usuario y `documentNumber` como contraseña."
+					},
+					"response": []
+				},
+				{
+					"name": "3. Listar Pacientes (RECEPCIONISTA)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{receptionistToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/patients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients"
+							]
+						},
+						"description": "Obtiene la lista completa de todos los pacientes registrados en el sistema."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints exclusivos para Recepcionistas y Administradores para gestionar la admisión de pacientes."
+		},
+		{
+			"name": "HU-02: Agendamiento de Citas Médicas",
+			"item": [
+				{
+					"name": "Preparación (ADMIN)",
+					"item": [
+						{
+							"name": "1. Crear Especialidad",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Pediatría\",\n    \"description\": \"Atención médica para bebés, niños y adolescentes.\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/appointments/specialties",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"specialties"
+									]
+						 		},
+								"description": "Crea una nueva especialidad médica. Requerido antes de registrar médicos."
+							},
+							"response": []
+						},
+						{
+							"name": "2. Crear Médico",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Laura\",\n    \"lastName\": \"Ortiz\",\n    \"specialtyId\": \"REPLAZAR_CON_ID_ESPECIALIDAD\",\n    \"email\": \"laura.ortiz@hospital.com\",\n    \"phone\": \"3209876543\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/appointments/doctors",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"doctors"
+									]
+								},
+								"description": "Crea un médico y lo asocia a una especialidad. Reemplaza el `specialtyId` con el devuelto por la petición de Crear Especialidad."
+							},
+							"response": []
+						},
+						{
+							"name": "3. Crear Disponibilidad de Médico",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"doctorId\": \"REPLAZAR_CON_ID_MEDICO\",\n    \"date\": \"2026-06-20\",\n    \"startTime\": \"10:00\",\n    \"endTime\": \"10:30\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/appointments/availabilities",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"availabilities"
+									]
+								},
+								"description": "Define un bloque de tiempo libre de 30 minutos para un médico específico."
+							},
+							"response": []
+						}
+					],
+					"description": "Endpoints administrativos para estructurar el catálogo médico."
+				},
+				{
+					"name": "Flujo de Paciente Autónomo",
+					"item": [
+						{
+							"name": "1. Login Paciente Autónomo",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"try {",
+											"    const response = res.getBody();",
+											"    if (response && response.accessToken) {",
+											"        tc.setVar(\"patientToken\", response.accessToken);",
+											"        console.log(\"patientToken guardado con éxito!\");",
+											"    }",
+											"} catch (e) {",
+											"    console.warn(\"No se pudo obtener patientToken (respuesta no válida o error de login): \", e.message);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"carlos.gomez@gmail.com\",\n    \"password\": \"10203040\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "Inicia sesión con la cuenta autogenerada del paciente (Email = Carlos Gomez, Password = Cedula)."
+							},
+							"response": []
+						},
+						{
+							"name": "2. Consultar Especialidades",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{patientToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/specialties",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"specialties"
+									]
+								},
+								"description": "Permite al paciente listar las especialidades activas de forma autónoma."
+							},
+							"response": []
+						},
+						{
+							"name": "3. Consultar Médicos por Especialidad",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{patientToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/doctors?specialtyId=REPLAZAR_CON_ID_ESPECIALIDAD",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"doctors"
+									],
+									"query": [
+										{
+											"key": "specialtyId",
+											"value": "REPLAZAR_CON_ID_ESPECIALIDAD"
+										}
+									]
+								},
+								"description": "Filtra la lista de médicos para la especialidad seleccionada."
+							},
+							"response": []
+						},
+						{
+							"name": "4. Consultar Horarios Disponibles de Médico",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{patientToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/availabilities?doctorId=REPLAZAR_CON_ID_MEDICO",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"availabilities"
+									],
+									"query": [
+										{
+											"key": "doctorId",
+											"value": "REPLAZAR_CON_ID_MEDICO"
+										}
+									]
+								},
+								"description": "Lista todos los slots libres configurados para el médico."
+							},
+							"response": []
+						},
+						{
+							"name": "5. Agendar Cita de manera Autónoma",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{patientToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"availabilityId\": \"REPLAZAR_CON_ID_DISPONIBILIDAD\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/appointments/book",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"book"
+									]
+								},
+								"description": "Agenda de forma segura el bloque médico. Pasa el `availabilityId` que se desea reservar."
+							},
+							"response": []
+						}
+					],
+					"description": "Flujo interactivo autónomo de consulta y agendamiento para pacientes."
+				}
+			],
+			"description": "Agrupación de endpoints para la creación del catálogo médico y flujo interactivo del paciente."
+		},
+		{
+			"name": "HU-04: Recursos Hospitalarios (ADMIN)",
+			"item": [
+				{
+					"name": "1. Crear Recurso",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Paracetamol 500mg\",\n    \"type\": \"MEDICINE\",\n    \"quantity\": 500,\n    \"description\": \"Analgésico e inflamatorio de uso básico.\",\n    \"location\": \"Estantería Farmacia A\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/resources",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"resources"
+							]
+						},
+						"description": "Crea un recurso hospitalario (MEDICINE, CLOTHING, EQUIPMENT). Restringido a Administradores."
+					},
+					"response": []
+				},
+				{
+					"name": "2. Listar Todos los Recursos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/resources",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"resources"
+							]
+						},
+						"description": "Permite listar todos los recursos médicos registrados."
+					},
+					"response": []
+				},
+				{
+					"name": "3. Obtener Recurso por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/resources/REPLAZAR_CON_ID_RECURSO",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"resources",
+								"REPLAZAR_CON_ID_RECURSO"
+							]
+						},
+						"description": "Obtiene la ficha individual de un recurso hospitalario."
+					},
+					"response": []
+				},
+				{
+					"name": "4. Modificar Recurso por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 750,\n    \"location\": \"Bodega Central Farmacia\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/resources/REPLAZAR_CON_ID_RECURSO",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"resources",
+								"REPLAZAR_CON_ID_RECURSO"
+							]
+						},
+						"description": "Actualiza parcialmente datos del recurso como stock o ubicación."
+					},
+					"response": []
+				},
+				{
+					"name": "5. Eliminar Recurso por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/resources/REPLAZAR_CON_ID_RECURSO",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"resources",
+								"REPLAZAR_CON_ID_RECURSO"
+							]
+						},
+						"description": "Borra definitivamente un insumo o recurso del catálogo."
+					},
+					"response": []
+				}
+			],
+			"description": "Módulo de gestión de insumos restringido a personal de administración autorizado."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/api",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "receptionistToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "patientToken",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
