@@ -23,6 +23,11 @@ export class PatientRepositoryORM implements IPatientRepository {
     return ormPatient ? PatientMapper.toDomain(ormPatient) : null;
   }
 
+  async findByEmail(email: string): Promise<Patient | null> {
+    const ormPatient = await this.ormRepository.findOneBy({ email });
+    return ormPatient ? PatientMapper.toDomain(ormPatient) : null;
+  }
+
   async save(patient: Patient): Promise<Patient> {
     const ormPatient = PatientMapper.toORM(patient);
     const savedOrm = await this.ormRepository.save(ormPatient);

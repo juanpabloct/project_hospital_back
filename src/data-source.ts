@@ -7,6 +7,8 @@ import { DoctorORMEntity } from './modules/appointments/infrastructure/persisten
 import { DoctorAvailabilityORMEntity } from './modules/appointments/infrastructure/persistence/entities/DoctorAvailabilityORMEntity.js';
 import { AppointmentORMEntity } from './modules/appointments/infrastructure/persistence/entities/AppointmentORMEntity.js';
 import { ResourceORMEntity } from './modules/resources/infrastructure/persistence/entities/ResourceORMEntity.js';
+import { MedicalHistoryRecordORMEntity } from './modules/medical-histories/infrastructure/persistence/entities/MedicalHistoryRecordORMEntity.js';
+import { MedicalHistorySupplyORMEntity } from './modules/medical-histories/infrastructure/persistence/entities/MedicalHistorySupplyORMEntity.js';
 
 dotenv.config();
 
@@ -27,6 +29,8 @@ export const AppDataSource = new DataSource({
     DoctorAvailabilityORMEntity,
     AppointmentORMEntity,
     ResourceORMEntity,
+    MedicalHistoryRecordORMEntity,
+    MedicalHistorySupplyORMEntity,
   ],
   migrations: ['src/migrations/**/*.ts'],
   subscribers: [],

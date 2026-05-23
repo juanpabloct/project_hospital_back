@@ -31,7 +31,8 @@ export class DomainExceptionsFilter implements ExceptionFilter {
       status = HttpStatus.NOT_FOUND;
     } else if (
       errorName === 'InvalidSlotException' ||
-      errorName === 'BusinessValidationError'
+      errorName === 'BusinessValidationError' ||
+      errorName === 'InsufficientResourceQuantityError'
     ) {
       status = HttpStatus.BAD_REQUEST;
     } else if (exception.status && typeof exception.status === 'number') {
